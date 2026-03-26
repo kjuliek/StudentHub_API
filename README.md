@@ -224,6 +224,7 @@ Base URL: `http://localhost:3000`
 |--------|----------|-------------|---------|--------|
 | `GET` | `/students` | List all students | 200 | — |
 | `GET` | `/students?page=1&limit=10` | List students with pagination | 200 | 400 |
+| `GET` | `/students?sort=grade&order=desc` | List students with sort | 200 | 400 |
 | `GET` | `/students/stats` | Get statistics | 200 | — |
 | `GET` | `/students/search?q=` | Search students by name | 200 | 400 |
 | `POST` | `/students` | Create a new student | 201 | 400, 409 |
@@ -249,6 +250,19 @@ When `?page` or `?limit` are provided, the response format changes:
 
 - `page` and `limit` must be positive integers → otherwise 400
 - If the page is out of range, `data` is an empty array
+
+### Sorting
+
+The `?sort` and `?order` parameters are available on `GET /students` and `GET /students/search`.
+
+| Parameter | Values | Default |
+|-----------|--------|---------|
+| `sort` | `id`, `firstName`, `lastName`, `email`, `grade`, `field` | none |
+| `order` | `asc`, `desc` | `asc` |
+
+- Invalid `sort` field → 400
+- Invalid `order` value → 400
+- Sort and pagination can be combined: `?sort=grade&order=desc&page=1&limit=2`
 
 ### Examples (Git Bash)
 
