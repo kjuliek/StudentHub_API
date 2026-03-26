@@ -9,7 +9,7 @@ const initialStudents = [
 let students = [...initialStudents];
 
 const resetStudents = () => {
-  students = [...initialStudents];
+  students.splice(0, students.length, ...initialStudents.map(s => ({ ...s })));
 };
 
 module.exports = { students, resetStudents };
