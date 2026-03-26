@@ -21,6 +21,35 @@ describe('GET /students', () => {
   });
 });
 
+// ─── GET /students?page&limit ─────────────────────────────────────────────────
+
+describe('GET /students with pagination', () => {
+  it('should return paginated data and pagination metadata', async () => {
+    const res = await request(app).get('/students?page=1&limit=2');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data).toHaveLength(2);
+    expect(res.body.pagination).toMatchObject({ page: 1, limit: 2, total: 5, totalPages: 3 });
+  });
+
+  it('should return the correct second page', async () => {
+    const res = await request(app).get('/students?page=2&limit=2');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data).toHaveLength(2);
+    expect(res.body.pagination.page).toBe(2);
+  });
+
+  it('should return empty data for out-of-range page', async () => {
+    const res = await request(app).get('/students?page=999&limit=10');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data).toHaveLength(0);
+  });
+
+  it('should return 400 for invalid page value', async () => {
+    const res = await request(app).get('/students?page=0&limit=10');
+    expect(res.statusCode).toBe(400);
+  });
+});
+
 // ─── GET /students/:id ───────────────────────────────────────────────────────
 
 describe('GET /students/:id', () => {
