@@ -135,32 +135,80 @@ Base URL: `http://localhost:3000`
 | `PUT` | `/students/:id` | Update a student | 200 | 400, 404, 409 |
 | `DELETE` | `/students/:id` | Delete a student | 200 | 400, 404 |
 
-### Examples (PowerShell)
+### Examples (Git Bash)
 
-```powershell
-# GET all students
-Invoke-RestMethod -Uri http://localhost:3000/students
+> Use Git Bash instead of PowerShell — `Invoke-RestMethod` does not display HTTP status codes on 4xx/5xx errors, making it impossible to verify error responses without extra workarounds.
 
-# GET one student
-Invoke-RestMethod -Uri http://localhost:3000/students/1
-
-# POST — create a student
-Invoke-RestMethod -Method POST -Uri http://localhost:3000/students -ContentType "application/json" -Body '{"firstName":"Lea","lastName":"Simon","email":"lea.simon@email.com","grade":14,"field":"physique"}'
-
-# PUT — update a student
-Invoke-RestMethod -Method PUT -Uri http://localhost:3000/students/1 -ContentType "application/json" -Body '{"firstName":"Alice","lastName":"Martin","email":"alice.martin@email.com","grade":19,"field":"informatique"}'
-
-# DELETE — delete a student
-Invoke-RestMethod -Method DELETE -Uri http://localhost:3000/students/2
-
-# GET stats
-Invoke-RestMethod -Uri http://localhost:3000/students/stats
-
-# GET search
-Invoke-RestMethod -Uri "http://localhost:3000/students/search?q=ali"
+GET /students — returns the full list
+```bash
+curl -s http://localhost:3000/students
 ```
 
+GET /students/1 — returns student with ID 1
+```bash
+curl -s http://localhost:3000/students/1
+```
+
+GET /students/999 — returns 404
+```bash
+curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/students/999
+```
+
+POST /students — valid data → 201
+```bash
+curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:3000/students -H "Content-Type: application/json" -d '{"firstName":"Lea","lastName":"Simon","email":"lea.simon@email.com","grade":14,"field":"physique"}'
+```
+
+POST /students — without email → 400
+```bash
+curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:3000/students -H "Content-Type: application/json" -d '{"firstName":"Lea","lastName":"Simon","grade":14,"field":"physique"}'
+```
+
+POST /students — existing email → 409
+```bash
+curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:3000/students -H "Content-Type: application/json" -d '{"firstName":"Lea","lastName":"Simon","email":"alice.martin@email.com","grade":14,"field":"physique"}'
+```
+
+PUT /students/1 — update a student
+```bash
+curl -s -o /dev/null -w "%{http_code}" -X PUT http://localhost:3000/students/1 -H "Content-Type: application/json" -d '{"firstName":"Alice","lastName":"Martin","email":"alice.martin@email.com","grade":19,"field":"informatique"}'
+```
+
+DELETE /students/1 — delete a student
+```bash
+curl -s -o /dev/null -w "%{http_code}" -X DELETE http://localhost:3000/students/1
+```
+
+GET /students/stats — returns statistics
+```bash
+curl -s http://localhost:3000/students/stats
+```
+
+GET /students/search?q=ahmed — returns matching results
+```bash
+curl -s "http://localhost:3000/students/search?q=ahmed"
+```
+
+### Verification Checklist
+
+- [ ] `GET /students` returns the full list
+- [ ] `GET /students/1` returns student with ID 1
+- [ ] `GET /students/999` returns 404
+- [ ] `POST /students` with valid data → 201
+- [ ] `POST /students` without email → 400
+- [ ] `POST /students` with existing email → 409
+- [ ] `PUT /students/1` updates the student
+- [ ] `DELETE /students/1` deletes the student
+- [ ] `GET /students/stats` returns statistics
+- [ ] `GET /students/search?q=ahmed` returns results
+
 ## Known Issues & Troubleshooting
+
+### PowerShell — HTTP error codes not visible
+
+**Problem:** `Invoke-RestMethod` throws an exception on 4xx/5xx responses without displaying the HTTP status code, making it impossible to verify error handling directly.
+
+**Fix:** Use **Git Bash** with `curl` instead. The `-s -o /dev/null -w "%{http_code}"` flags display only the status code, and removing `-o /dev/null` shows the response body.
 
 ### Express 5 incompatibility
 
