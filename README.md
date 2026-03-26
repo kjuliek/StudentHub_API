@@ -46,8 +46,8 @@ The pipeline runs in parallel on **Node.js 18 and 20** to ensure compatibility a
 
 | Step | Command | Description |
 |------|---------|-------------|
-| Checkout | `actions/checkout@v4` | Clone the repository into the runner |
-| Setup | `actions/setup-node@v4` | Install the Node.js version from the matrix |
+| Checkout | `actions/checkout@v5` | Clone the repository into the runner |
+| Setup | `actions/setup-node@v5` | Install the Node.js version from the matrix |
 | Install | `npm install` | Install all dependencies |
 | Lint | `npm run lint` | Check code quality — any error fails the pipeline |
 | Test | `npm test` | Run the test suite — any failure fails the pipeline |
@@ -322,6 +322,18 @@ console.log(`Server running on port ${PORT}`);
 **Problem:** `Invoke-RestMethod` throws an exception on 4xx/5xx responses without displaying the HTTP status code, making it impossible to verify error handling directly.
 
 **Fix:** Use **Git Bash** with `curl` instead. The `-s -o /dev/null -w "%{http_code}"` flags display only the status code, and removing `-o /dev/null` shows the response body.
+
+### GitHub Actions — Node.js 20 deprecation warning
+
+**Warning:** `actions/checkout@v4` and `actions/setup-node@v4` use Node.js 20 internally, which GitHub will deprecate in June 2026.
+
+**Fix:** Upgrade to `@v5` which uses Node.js 24:
+```yaml
+uses: actions/checkout@v5
+uses: actions/setup-node@v5
+```
+
+> This is unrelated to the Express or Node.js version used by the API — it only affects GitHub's internal pipeline tooling.
 
 ### `resetStudents` not working in tests
 
