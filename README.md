@@ -57,6 +57,18 @@ The pipeline runs in parallel on **Node.js 18 and 20** to ensure compatibility a
 - All steps pass on both Node versions → **pipeline green**
 - Any lint error or failing test → **pipeline red**
 
+### Red → Green cycle
+
+To prove the pipeline detects bugs, we intentionally introduced and then fixed a bug:
+
+1. **Green** — pipeline passing on all tests
+2. **Bug introduced** — changed POST status code from `201` to `200` in `src/routes/students.js`, causing the test `should return 201 and the created student with an ID` to fail
+   - Commit: `test: introduce intentional bug to demonstrate CI`
+3. **Red** — pipeline failed (see screenshot)
+4. **Fix applied** — restored correct `201` status code
+   - Commit: `fix: restore correct 201 status code on POST /students`
+5. **Green** — pipeline passing again (see screenshot)
+
 ## Available Scripts
 
 | Command | Description |
