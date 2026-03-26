@@ -28,7 +28,7 @@ router.post('/', (req, res) => {
     return res.status(400).json({ errors: validation.errors });
   }
   const student = createStudent(req.body);
-  res.status(200).json(student);
+  res.status(201).json(student);
 });
 
 // GET /students/:id — get one student
