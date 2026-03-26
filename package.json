@@ -18,7 +18,7 @@
     "collectCoverage": true,
     "coverageDirectory": "coverage",
     "coverageReporters": ["text", "lcov"],
-    "collectCoverageFrom": ["src/**/*.js"]
+    "collectCoverageFrom": ["src/**/*.js", "!src/index.js"]
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
