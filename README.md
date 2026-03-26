@@ -32,6 +32,40 @@ npm install
 | `npm test` | Run the test suite with Jest |
 | `npm run lint` | Run ESLint on the codebase |
 
+## Testing
+
+Tests are written with **Jest** and **Supertest**. Supertest allows sending HTTP requests directly to the Express app without starting the server on a port.
+
+Each test file follows this structure:
+- `beforeEach` resets the in-memory data so every test starts with the same 5 students, independent of the others
+- `describe` groups tests by route
+- `it` defines a single test case, checking both the HTTP status code and the response body
+
+Run the tests:
+```bash
+npm test
+```
+
+### Test list
+
+| # | Route | Description |
+|---|-------|-------------|
+| 1 | `GET /students` | Returns 200 and an array |
+| 2 | `GET /students` | Returns all 5 initial students |
+| 3 | `GET /students/:id` | Returns the correct student for a valid ID |
+| 4 | `GET /students/:id` | Returns 404 for a non-existing ID |
+| 5 | `GET /students/:id` | Returns 400 for an invalid ID (e.g. "abc") |
+| 6 | `POST /students` | Returns 201 and the created student with an ID |
+| 7 | `POST /students` | Returns 400 when a required field is missing |
+| 8 | `POST /students` | Returns 400 for an invalid grade (e.g. 25) |
+| 9 | `POST /students` | Returns 409 for a duplicate email |
+| 10 | `PUT /students/:id` | Returns 200 and the updated student |
+| 11 | `PUT /students/:id` | Returns 404 for a non-existing ID |
+| 12 | `DELETE /students/:id` | Returns 200 for a valid ID |
+| 13 | `DELETE /students/:id` | Returns 404 for a non-existing ID |
+| 14 | `GET /students/stats` | Returns totalStudents, averageGrade, studentsByField, bestStudent |
+| 15 | `GET /students/search` | Returns matching students by name |
+
 ## Project Setup (how this project was initialized)
 
 ### 1. Initialize npm
