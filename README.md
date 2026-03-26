@@ -78,3 +78,22 @@ Options selected:
 ### 5. Create the entry point
 
 Create `src/index.js` with a basic Express server.
+
+## Project Structure
+
+```
+StudentHub_API/
+├── .github/workflows/
+│   └── ci.yml              ← CI pipeline
+├── src/
+│   ├── data/               ← In-memory data
+│   ├── routes/             ← API endpoints
+│   ├── app.js              ← Express config (no server start)
+│   └── index.js            ← Server entry point (app.listen)
+├── tests/                  ← Test files
+├── .gitignore
+├── eslint.config.mjs
+└── package.json
+```
+
+> `app.js` and `index.js` are intentionally separated so that tests can import the app without starting the server on a port.
