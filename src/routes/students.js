@@ -9,7 +9,10 @@ router.get('/', (req, res) => {
 
 // GET /students/:id — get one student
 router.get('/:id', (req, res) => {
-  const student = students.find(s => s.id === parseInt(req.params.id));
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) return res.status(400).json({ error: 'ID must be a valid number' });
+
+  const student = students.find(s => s.id === id);
   if (!student) return res.status(404).json({ error: 'Student not found' });
   res.json(student);
 });
