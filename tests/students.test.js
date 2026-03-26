@@ -229,3 +229,68 @@ describe('GET /students/search with sort and pagination', () => {
     expect(res.body.pagination).toBeDefined();
   });
 });
+
+// ─── Edge cases ───────────────────────────────────────────────────────────────
+
+describe('Edge cases', () => {
+  it('POST — should return 400 for firstName shorter than 2 characters', async () => {
+    const res = await request(app).post('/students').send({ ...validStudent, firstName: 'A' });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('POST — should accept grade = 0 (lower boundary)', async () => {
+    const res = await request(app).post('/students').send({ ...validStudent, grade: 0 });
+    expect(res.statusCode).toBe(201);
+    expect(res.body.grade).toBe(0);
+  });
+
+  it('POST — should accept grade = 20 (upper boundary)', async () => {
+    const res = await request(app).post('/students').send({ ...validStudent, grade: 20 });
+    expect(res.statusCode).toBe(201);
+    expect(res.body.grade).toBe(20);
+  });
+
+  it('POST — should return 400 for grade = -1', async () => {
+    const res = await request(app).post('/students').send({ ...validStudent, grade: -1 });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('POST — should return 400 for invalid field value', async () => {
+    const res = await request(app).post('/students').send({ ...validStudent, field: 'biologie' });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('POST — should return 400 for invalid email format', async () => {
+    const res = await request(app).post('/students').send({ ...validStudent, email: 'not-an-email' });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('GET /search — should return empty array when no match', async () => {
+    const res = await request(app).get('/students/search?q=zzzzzz');
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveLength(0);
+  });
+
+  it('GET /search — should be case insensitive', async () => {
+    const res = await request(app).get('/students/search?q=ALICE');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.length).toBeGreaterThan(0);
+  });
+
+  it('GET /search — should return 400 for missing q parameter', async () => {
+    const res = await request(app).get('/students/search');
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('DELETE — student should no longer exist after deletion', async () => {
+    await request(app).delete('/students/1');
+    const res = await request(app).get('/students/1');
+    expect(res.statusCode).toBe(404);
+  });
+
+  it('PUT — updated data should be persisted', async () => {
+    await request(app).put('/students/1').send({ ...validStudent, email: 'alice.martin@email.com', grade: 5 });
+    const res = await request(app).get('/students/1');
+    expect(res.body.grade).toBe(5);
+  });
+});
