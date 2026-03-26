@@ -159,3 +159,31 @@ describe('GET /students/search', () => {
     expect(res.body[0].firstName.toLowerCase()).toContain('alice');
   });
 });
+
+// ─── GET /students?sort ───────────────────────────────────────────────────────
+
+describe('GET /students with sort', () => {
+  it('should return students sorted by grade descending', async () => {
+    const res = await request(app).get('/students?sort=grade&order=desc');
+    expect(res.statusCode).toBe(200);
+    const grades = res.body.map(s => s.grade);
+    expect(grades).toEqual([...grades].sort((a, b) => b - a));
+  });
+
+  it('should return students sorted by grade ascending', async () => {
+    const res = await request(app).get('/students?sort=grade&order=asc');
+    expect(res.statusCode).toBe(200);
+    const grades = res.body.map(s => s.grade);
+    expect(grades).toEqual([...grades].sort((a, b) => a - b));
+  });
+
+  it('should return 400 for an invalid sort field', async () => {
+    const res = await request(app).get('/students?sort=invalid');
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('should return 400 for an invalid order value', async () => {
+    const res = await request(app).get('/students?sort=grade&order=invalid');
+    expect(res.statusCode).toBe(400);
+  });
+});
