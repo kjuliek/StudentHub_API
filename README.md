@@ -32,6 +32,22 @@ npm install
 | `npm test` | Run the test suite with Jest |
 | `npm run lint` | Run ESLint on the codebase |
 
+### Linter setup
+
+ESLint is configured in `eslint.config.mjs` with the following rules:
+
+| Rule | Level | Description |
+|------|-------|-------------|
+| `no-unused-vars` | error | No declared variables left unused (variables prefixed with `_` are ignored) |
+| `no-console` | warn | No forgotten `console.log` statements |
+| `eqeqeq` | error | Always use `===` instead of `==` |
+| `no-unreachable` | error | No code after `return`/`throw` |
+
+Run the linter:
+```bash
+npm run lint
+```
+
 ## Testing
 
 Tests are written with **Jest** and **Supertest**. Supertest allows sending HTTP requests directly to the Express app without starting the server on a port.
@@ -237,6 +253,36 @@ curl -s "http://localhost:3000/students/search?q=ahmed"
 - [ ] `GET /students/search?q=ahmed` returns results
 
 ## Known Issues & Troubleshooting
+
+### ESLint errors after configuration
+
+After setting up ESLint, running `npm run lint` raised several errors:
+
+**Jest globals not recognized (`no-undef`)**
+ESLint didn't know about Jest's globals (`describe`, `it`, `expect`, `beforeEach`).
+Fix: add `globals.jest` to the ESLint config for test files:
+```js
+{ files: ["tests/**/*.js"], languageOptions: { globals: { ...globals.jest } } }
+```
+
+**`eslint.config.mjs` parsing error**
+Setting `sourceType: "commonjs"` on all files broke the config file itself (which uses ESM `import/export`).
+Fix: apply `sourceType: "commonjs"` only to `**/*.js` files, not `**/*.{js,mjs,cjs}`.
+
+**Unused destructured variable (`no-unused-vars`)**
+Destructuring `const { email, ...rest }` to exclude a field flags `email` as unused.
+Fix: prefix with `_` to signal it's intentionally ignored (`email: _email`), and configure ESLint to allow it:
+```js
+"no-unused-vars": ["error", { "varsIgnorePattern": "^_", "argsIgnorePattern": "^_" }]
+```
+
+**`console.log` in `index.js` (`no-console`)**
+The server startup log triggered a warning.
+Fix: disable the rule for that specific line:
+```js
+// eslint-disable-next-line no-console
+console.log(`Server running on port ${PORT}`);
+```
 
 ### PowerShell — HTTP error codes not visible
 
