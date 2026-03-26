@@ -3,21 +3,38 @@ const router = express.Router();
 const { students } = require('../data/students');
 const { validateStudent, createStudent, updateStudent, deleteStudent, getStats, searchStudents, getStudents, sortArray, VALID_SORT_FIELDS } = require('../services/students');
 
+function validateSortParams(sort, order, res) {
+  if (sort !== undefined && !VALID_SORT_FIELDS.includes(sort)) {
+    res.status(400).json({ error: `sort must be one of: ${VALID_SORT_FIELDS.join(', ')}` });
+    return false;
+  }
+  if (order !== 'asc' && order !== 'desc') {
+    res.status(400).json({ error: 'order must be asc or desc' });
+    return false;
+  }
+  return true;
+}
+
+function parsePaginationParams(page, limit, res) {
+  const p = parseInt(page ?? 1);
+  const l = parseInt(limit ?? 10);
+  if (isNaN(p) || isNaN(l) || p < 1 || l < 1) {
+    res.status(400).json({ error: 'page and limit must be positive integers' });
+    return null;
+  }
+  return { p, l };
+}
+
 // GET /students — list all students with optional pagination and sort
 router.get('/', (req, res) => {
   const { page, limit, sort, order = 'asc' } = req.query;
 
-  if (sort !== undefined && !VALID_SORT_FIELDS.includes(sort))
-    return res.status(400).json({ error: `sort must be one of: ${VALID_SORT_FIELDS.join(', ')}` });
-
-  if (order !== 'asc' && order !== 'desc')
-    return res.status(400).json({ error: 'order must be asc or desc' });
+  if (!validateSortParams(sort, order, res)) return;
 
   if (page !== undefined || limit !== undefined) {
-    const p = parseInt(page ?? 1);
-    const l = parseInt(limit ?? 10);
-    if (isNaN(p) || isNaN(l) || p < 1 || l < 1) return res.status(400).json({ error: 'page and limit must be positive integers' });
-    return res.json(getStudents(p, l, sort, order));
+    const pagination = parsePaginationParams(page, limit, res);
+    if (!pagination) return;
+    return res.json(getStudents(pagination.p, pagination.l, sort, order));
   }
 
   res.json(sort ? sortArray(students, sort, order) : students);
@@ -33,17 +50,12 @@ router.get('/search', (req, res) => {
   const { q, page, limit, sort, order = 'asc' } = req.query;
   if (!q || q.trim() === '') return res.status(400).json({ error: 'Query parameter q is required' });
 
-  if (sort !== undefined && !VALID_SORT_FIELDS.includes(sort))
-    return res.status(400).json({ error: `sort must be one of: ${VALID_SORT_FIELDS.join(', ')}` });
-
-  if (order !== 'asc' && order !== 'desc')
-    return res.status(400).json({ error: 'order must be asc or desc' });
+  if (!validateSortParams(sort, order, res)) return;
 
   if (page !== undefined || limit !== undefined) {
-    const p = parseInt(page ?? 1);
-    const l = parseInt(limit ?? 10);
-    if (isNaN(p) || isNaN(l) || p < 1 || l < 1) return res.status(400).json({ error: 'page and limit must be positive integers' });
-    return res.json(searchStudents(q, p, l, sort, order));
+    const pagination = parsePaginationParams(page, limit, res);
+    if (!pagination) return;
+    return res.json(searchStudents(q, pagination.p, pagination.l, sort, order));
   }
 
   res.json(searchStudents(q, null, null, sort, order));
