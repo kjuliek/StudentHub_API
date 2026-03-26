@@ -64,6 +64,16 @@ function getStats() {
   return { totalStudents: total, averageGrade, studentsByField, bestStudent };
 }
 
+const VALID_SORT_FIELDS = ['id', 'firstName', 'lastName', 'email', 'grade', 'field'];
+
+function sortArray(array, sort, order) {
+  return [...array].sort((a, b) => {
+    if (a[sort] < b[sort]) return order === 'asc' ? -1 : 1;
+    if (a[sort] > b[sort]) return order === 'asc' ? 1 : -1;
+    return 0;
+  });
+}
+
 function paginate(array, page, limit) {
   const start = (page - 1) * limit;
   return {
@@ -77,16 +87,18 @@ function paginate(array, page, limit) {
   };
 }
 
-function searchStudents(query, page = null, limit = null) {
+function searchStudents(query, page = null, limit = null, sort = null, order = 'asc') {
   const q = query.toLowerCase();
-  const results = students.filter(s =>
+  let results = students.filter(s =>
     s.firstName.toLowerCase().includes(q) || s.lastName.toLowerCase().includes(q)
   );
+  if (sort) results = sortArray(results, sort, order);
   return page && limit ? paginate(results, page, limit) : results;
 }
 
-function getStudents(page, limit) {
-  return paginate(students, page, limit);
+function getStudents(page, limit, sort = null, order = 'asc') {
+  const list = sort ? sortArray(students, sort, order) : [...students];
+  return paginate(list, page, limit);
 }
 
-module.exports = { validateStudent, createStudent, updateStudent, deleteStudent, getStats, searchStudents, getStudents };
+module.exports = { validateStudent, createStudent, updateStudent, deleteStudent, getStats, searchStudents, getStudents, sortArray, VALID_SORT_FIELDS };

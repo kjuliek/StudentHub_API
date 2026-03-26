@@ -1,22 +1,26 @@
 const express = require('express');
 const router = express.Router();
 const { students } = require('../data/students');
-const { validateStudent, createStudent, updateStudent, deleteStudent, getStats, searchStudents, getStudents } = require('../services/students');
+const { validateStudent, createStudent, updateStudent, deleteStudent, getStats, searchStudents, getStudents, sortArray, VALID_SORT_FIELDS } = require('../services/students');
 
-// GET /students — list all students with optional pagination
+// GET /students — list all students with optional pagination and sort
 router.get('/', (req, res) => {
-  const { page, limit } = req.query;
+  const { page, limit, sort, order = 'asc' } = req.query;
+
+  if (sort !== undefined && !VALID_SORT_FIELDS.includes(sort))
+    return res.status(400).json({ error: `sort must be one of: ${VALID_SORT_FIELDS.join(', ')}` });
+
+  if (order !== 'asc' && order !== 'desc')
+    return res.status(400).json({ error: 'order must be asc or desc' });
 
   if (page !== undefined || limit !== undefined) {
     const p = parseInt(page ?? 1);
     const l = parseInt(limit ?? 10);
-
     if (isNaN(p) || isNaN(l) || p < 1 || l < 1) return res.status(400).json({ error: 'page and limit must be positive integers' });
-
-    return res.json(getStudents(p, l));
+    return res.json(getStudents(p, l, sort, order));
   }
 
-  res.json(students);
+  res.json(sort ? sortArray(students, sort, order) : students);
 });
 
 // GET /students/stats — get statistics
@@ -24,19 +28,25 @@ router.get('/stats', (_req, res) => {
   res.json(getStats());
 });
 
-// GET /students/search?q= — search by name with optional pagination
+// GET /students/search?q= — search by name with optional pagination and sort
 router.get('/search', (req, res) => {
-  const { q, page, limit } = req.query;
+  const { q, page, limit, sort, order = 'asc' } = req.query;
   if (!q || q.trim() === '') return res.status(400).json({ error: 'Query parameter q is required' });
+
+  if (sort !== undefined && !VALID_SORT_FIELDS.includes(sort))
+    return res.status(400).json({ error: `sort must be one of: ${VALID_SORT_FIELDS.join(', ')}` });
+
+  if (order !== 'asc' && order !== 'desc')
+    return res.status(400).json({ error: 'order must be asc or desc' });
 
   if (page !== undefined || limit !== undefined) {
     const p = parseInt(page ?? 1);
     const l = parseInt(limit ?? 10);
     if (isNaN(p) || isNaN(l) || p < 1 || l < 1) return res.status(400).json({ error: 'page and limit must be positive integers' });
-    return res.json(searchStudents(q, p, l));
+    return res.json(searchStudents(q, p, l, sort, order));
   }
 
-  res.json(searchStudents(q));
+  res.json(searchStudents(q, null, null, sort, order));
 });
 
 // POST /students — create a student
