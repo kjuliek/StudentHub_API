@@ -312,59 +312,146 @@ The `?sort` and `?order` parameters are available on `GET /students` and `GET /s
 
 > Use Git Bash instead of PowerShell — `Invoke-RestMethod` does not display HTTP status codes on 4xx/5xx errors, making it impossible to verify error responses without extra workarounds.
 
+---
+
 GET /students — returns the full list
 ```bash
 curl -s http://localhost:3000/students
 ```
+Expected response:
+```json
+[
+  {"id":1,"firstName":"Alice","lastName":"Martin","email":"alice.martin@email.com","grade":18,"field":"informatique"},
+  {"id":2,"firstName":"Bob","lastName":"Dupont","email":"bob.dupont@email.com","grade":12,"field":"mathématiques"},
+  {"id":3,"firstName":"Clara","lastName":"Bernard","email":"clara.bernard@email.com","grade":15,"field":"physique"},
+  {"id":4,"firstName":"David","lastName":"Leroy","email":"david.leroy@email.com","grade":9,"field":"chimie"},
+  {"id":5,"firstName":"Emma","lastName":"Petit","email":"emma.petit@email.com","grade":17,"field":"informatique"}
+]
+```
+
+---
 
 GET /students with pagination — returns page 1 with 2 students per page
 ```bash
 curl -s "http://localhost:3000/students?page=1&limit=2"
 ```
+Expected response:
+```json
+{
+  "data": [
+    { "id": 1, "firstName": "Alice", "lastName": "Martin", "email": "alice.martin@email.com", "grade": 18, "field": "informatique" }
+  ],
+  "pagination": { "page": 1, "limit": 2, "total": 5, "totalPages": 3 }
+}
+```
+
+---
 
 GET /students/1 — returns student with ID 1
 ```bash
 curl -s http://localhost:3000/students/1
 ```
+Expected response:
+```json
+{ "id": 1, "firstName": "Alice", "lastName": "Martin", "email": "alice.martin@email.com", "grade": 18, "field": "informatique" }
+```
+
+---
 
 GET /students/999 — returns 404
 ```bash
-curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/students/999
+curl -s http://localhost:3000/students/999
 ```
+Expected response:
+```json
+{ "error": "Student not found" }
+```
+
+---
 
 POST /students — valid data → 201
 ```bash
-curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:3000/students -H "Content-Type: application/json" -d '{"firstName":"Lea","lastName":"Simon","email":"lea.simon@email.com","grade":14,"field":"physique"}'
+curl -s -X POST http://localhost:3000/students -H "Content-Type: application/json" -d '{"firstName":"Lea","lastName":"Simon","email":"lea.simon@email.com","grade":14,"field":"physique"}'
 ```
+Expected response:
+```json
+{ "id": 6, "firstName": "Lea", "lastName": "Simon", "email": "lea.simon@email.com", "grade": 14, "field": "physique" }
+```
+
+---
 
 POST /students — without email → 400
 ```bash
-curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:3000/students -H "Content-Type: application/json" -d '{"firstName":"Lea","lastName":"Simon","grade":14,"field":"physique"}'
+curl -s -X POST http://localhost:3000/students -H "Content-Type: application/json" -d '{"firstName":"Lea","lastName":"Simon","grade":14,"field":"physique"}'
 ```
+Expected response:
+```json
+{ "errors": ["email must be valid"] }
+```
+
+---
 
 POST /students — existing email → 409
 ```bash
-curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:3000/students -H "Content-Type: application/json" -d '{"firstName":"Lea","lastName":"Simon","email":"alice.martin@email.com","grade":14,"field":"physique"}'
+curl -s -X POST http://localhost:3000/students -H "Content-Type: application/json" -d '{"firstName":"Lea","lastName":"Simon","email":"alice.martin@email.com","grade":14,"field":"physique"}'
+```
+Expected response:
+```json
+{ "error": "email already in use" }
 ```
 
 PUT /students/1 — update a student
 ```bash
-curl -s -o /dev/null -w "%{http_code}" -X PUT http://localhost:3000/students/1 -H "Content-Type: application/json" -d '{"firstName":"Alice","lastName":"Martin","email":"alice.martin@email.com","grade":19,"field":"informatique"}'
+curl -s -X PUT http://localhost:3000/students/1 -H "Content-Type: application/json" -d '{"firstName":"Alice","lastName":"Martin","email":"alice.martin@email.com","grade":19,"field":"informatique"}'
 ```
+Expected response:
+```json
+{ "id": 1, "firstName": "Alice", "lastName": "Martin", "email": "alice.martin@email.com", "grade": 19, "field": "informatique" }
+```
+
+---
 
 DELETE /students/1 — delete a student
 ```bash
-curl -s -o /dev/null -w "%{http_code}" -X DELETE http://localhost:3000/students/1
+curl -s -X DELETE http://localhost:3000/students/1
 ```
+Expected response:
+```json
+{ "message": "Student 1 deleted successfully" }
+```
+
+---
 
 GET /students/stats — returns statistics
 ```bash
 curl -s http://localhost:3000/students/stats
 ```
+Expected response:
+```json
+{
+  "totalStudents": 5,
+  "averageGrade": 14.2,
+  "studentsByField": {
+    "informatique": 2,
+    "mathématiques": 1,
+    "physique": 1,
+    "chimie": 1
+  },
+  "bestStudent": { "id": 1, "firstName": "Alice", "lastName": "Martin", "email": "alice.martin@email.com", "grade": 18, "field": "informatique" }
+}
+```
 
-GET /students/search?q=ahmed — returns matching results
+---
+
+GET /students/search?q=ali — returns matching results
 ```bash
-curl -s "http://localhost:3000/students/search?q=ahmed"
+curl -s "http://localhost:3000/students/search?q=ali"
+```
+Expected response:
+```json
+[
+  { "id": 1, "firstName": "Alice", "lastName": "Martin", "email": "alice.martin@email.com", "grade": 18, "field": "informatique" }
+]
 ```
 
 ### Verification Checklist
