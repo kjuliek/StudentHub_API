@@ -60,7 +60,7 @@ describe('POST /students', () => {
   });
 
   it('should return 400 when a required field is missing', async () => {
-    const { email, ...withoutEmail } = validStudent;
+    const { email: _email, ...withoutEmail } = validStudent;
     const res = await request(app).post('/students').send(withoutEmail);
     expect(res.statusCode).toBe(400);
   });
