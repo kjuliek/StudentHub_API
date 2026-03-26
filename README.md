@@ -97,3 +97,20 @@ StudentHub_API/
 ```
 
 > `app.js` and `index.js` are intentionally separated so that tests can import the app without starting the server on a port.
+
+## Data Model
+
+Data is stored **in memory** (no database). Data resets on every server restart.
+
+### Student
+
+| Property | Type | Required | Constraints |
+|----------|------|----------|-------------|
+| `id` | Integer | Auto-generated | Unique, auto-incremented |
+| `firstName` | String | Yes | Min 2 characters |
+| `lastName` | String | Yes | Min 2 characters |
+| `email` | String | Yes | Valid email format, unique |
+| `grade` | Number | Yes | Between 0 and 20 |
+| `field` | String | Yes | `informatique`, `mathématiques`, `physique`, or `chimie` |
+
+The data file (`src/data/students.js`) is pre-filled with 5 test students and exposes a `resetStudents()` function used to restore the initial state between tests.
