@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { students } = require('../data/students');
-const { validateStudent, createStudent } = require('../services/students');
+const { validateStudent, createStudent, updateStudent, deleteStudent } = require('../services/students');
 
 // GET /students — list all students
 router.get('/', (req, res) => {
@@ -27,6 +27,35 @@ router.get('/:id', (req, res) => {
   const student = students.find(s => s.id === id);
   if (!student) return res.status(404).json({ error: 'Student not found' });
   res.json(student);
+});
+
+// PUT /students/:id — update a student
+router.put('/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) return res.status(400).json({ error: 'ID must be a valid number' });
+
+  const existing = students.find(s => s.id === id);
+  if (!existing) return res.status(404).json({ error: 'Student not found' });
+
+  const validation = validateStudent(req.body, id);
+  if (!validation.valid) {
+    if (validation.conflict) return res.status(409).json({ error: validation.conflict });
+    return res.status(400).json({ errors: validation.errors });
+  }
+
+  const updated = updateStudent(id, req.body);
+  res.json(updated);
+});
+
+// DELETE /students/:id — delete a student
+router.delete('/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) return res.status(400).json({ error: 'ID must be a valid number' });
+
+  const deleted = deleteStudent(id);
+  if (!deleted) return res.status(404).json({ error: 'Student not found' });
+
+  res.json({ message: `Student ${id} deleted successfully` });
 });
 
 module.exports = router;

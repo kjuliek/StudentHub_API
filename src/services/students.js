@@ -34,4 +34,18 @@ function createStudent(data) {
   return newStudent;
 }
 
-module.exports = { validateStudent, createStudent };
+function updateStudent(id, data) {
+  const index = students.findIndex(s => s.id === id);
+  if (index === -1) return null;
+  students[index] = { ...students[index], ...data };
+  return students[index];
+}
+
+function deleteStudent(id) {
+  const index = students.findIndex(s => s.id === id);
+  if (index === -1) return false;
+  students.splice(index, 1);
+  return true;
+}
+
+module.exports = { validateStudent, createStudent, updateStudent, deleteStudent };
