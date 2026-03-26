@@ -173,6 +173,8 @@ Jest is configured to collect coverage on all files in `src/` (except `index.js`
 
 > Coverage report is generated automatically on every `npm test` run in the `coverage/` directory.
 
+![Coverage report](docs/screenshots/coverage-report.png)
+
 ## Project Setup (how this project was initialized)
 
 ### 1. Initialize npm
