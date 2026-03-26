@@ -1,10 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const { students } = require('../data/students');
-const { validateStudent, createStudent, updateStudent, deleteStudent, getStats, searchStudents } = require('../services/students');
+const { validateStudent, createStudent, updateStudent, deleteStudent, getStats, searchStudents, getStudents } = require('../services/students');
 
-// GET /students — list all students
+// GET /students — list all students with optional pagination
 router.get('/', (req, res) => {
+  const { page, limit } = req.query;
+
+  if (page !== undefined || limit !== undefined) {
+    const p = parseInt(page) || 1;
+    const l = parseInt(limit) || 10;
+
+    if (p < 1 || l < 1) return res.status(400).json({ error: 'page and limit must be positive integers' });
+
+    return res.json(getStudents(p, l));
+  }
+
   res.json(students);
 });
 

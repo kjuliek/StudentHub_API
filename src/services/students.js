@@ -71,4 +71,18 @@ function searchStudents(query) {
   );
 }
 
-module.exports = { validateStudent, createStudent, updateStudent, deleteStudent, getStats, searchStudents };
+function getStudents(page, limit) {
+  const start = (page - 1) * limit;
+  const data = students.slice(start, start + limit);
+  return {
+    data,
+    pagination: {
+      page,
+      limit,
+      total: students.length,
+      totalPages: Math.ceil(students.length / limit),
+    },
+  };
+}
+
+module.exports = { validateStudent, createStudent, updateStudent, deleteStudent, getStats, searchStudents, getStudents };
