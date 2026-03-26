@@ -210,6 +210,16 @@ curl -s "http://localhost:3000/students/search?q=ahmed"
 
 **Fix:** Use **Git Bash** with `curl` instead. The `-s -o /dev/null -w "%{http_code}"` flags display only the status code, and removing `-o /dev/null` shows the response body.
 
+### `resetStudents` not working in tests
+
+**Problem:** The `resetStudents` function was reassigning the `students` variable with a new array (`students = [...]`). Since the service imports a reference to the original array at startup, it never sees the new array — making the reset ineffective between tests.
+
+**Fix:** Mutate the array in place instead of reassigning it:
+```js
+students.splice(0, students.length, ...initialStudents.map(s => ({ ...s })));
+```
+This way all modules holding a reference to the same array see the updated data.
+
 ### Express 5 incompatibility
 
 **Symptom:**
