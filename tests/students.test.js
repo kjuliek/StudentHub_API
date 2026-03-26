@@ -47,6 +47,7 @@ describe('GET /students with pagination', () => {
   it('should return 400 for invalid page value', async () => {
     const res = await request(app).get('/students?page=0&limit=10');
     expect(res.statusCode).toBe(400);
+    expect(res.body).toHaveProperty('error');
   });
 });
 
@@ -62,11 +63,13 @@ describe('GET /students/:id', () => {
   it('should return 404 for a non-existing ID', async () => {
     const res = await request(app).get('/students/999');
     expect(res.statusCode).toBe(404);
+    expect(res.body).toHaveProperty('error');
   });
 
   it('should return 400 for an invalid ID', async () => {
     const res = await request(app).get('/students/abc');
     expect(res.statusCode).toBe(400);
+    expect(res.body).toHaveProperty('error');
   });
 });
 
@@ -92,16 +95,19 @@ describe('POST /students', () => {
     const { email: _email, ...withoutEmail } = validStudent;
     const res = await request(app).post('/students').send(withoutEmail);
     expect(res.statusCode).toBe(400);
+    expect(Array.isArray(res.body.errors)).toBe(true);
   });
 
   it('should return 400 for an invalid grade', async () => {
     const res = await request(app).post('/students').send({ ...validStudent, grade: 25 });
     expect(res.statusCode).toBe(400);
+    expect(Array.isArray(res.body.errors)).toBe(true);
   });
 
   it('should return 409 for a duplicate email', async () => {
     const res = await request(app).post('/students').send({ ...validStudent, email: 'alice.martin@email.com' });
     expect(res.statusCode).toBe(409);
+    expect(res.body).toHaveProperty('error');
   });
 });
 
@@ -118,16 +124,19 @@ describe('PUT /students/:id', () => {
   it('should return 404 for a non-existing ID', async () => {
     const res = await request(app).put('/students/999').send(validStudent);
     expect(res.statusCode).toBe(404);
+    expect(res.body).toHaveProperty('error');
   });
 
   it('should return 400 for invalid data on PUT', async () => {
     const res = await request(app).put('/students/1').send({ ...validStudent, email: 'alice.martin@email.com', grade: 99 });
     expect(res.statusCode).toBe(400);
+    expect(Array.isArray(res.body.errors)).toBe(true);
   });
 
   it('should return 409 for duplicate email on PUT', async () => {
     const res = await request(app).put('/students/1').send({ ...validStudent, email: 'bob.dupont@email.com' });
     expect(res.statusCode).toBe(409);
+    expect(res.body).toHaveProperty('error');
   });
 });
 
@@ -142,6 +151,7 @@ describe('DELETE /students/:id', () => {
   it('should return 404 for a non-existing ID', async () => {
     const res = await request(app).delete('/students/999');
     expect(res.statusCode).toBe(404);
+    expect(res.body).toHaveProperty('error');
   });
 });
 
@@ -190,11 +200,13 @@ describe('GET /students with sort', () => {
   it('should return 400 for an invalid sort field', async () => {
     const res = await request(app).get('/students?sort=invalid');
     expect(res.statusCode).toBe(400);
+    expect(res.body).toHaveProperty('error');
   });
 
   it('should return 400 for an invalid order value', async () => {
     const res = await request(app).get('/students?sort=grade&order=invalid');
     expect(res.statusCode).toBe(400);
+    expect(res.body).toHaveProperty('error');
   });
 
   it('should sort correctly when two students have equal values', async () => {
