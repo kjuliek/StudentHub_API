@@ -146,6 +146,17 @@ npm test
 | 22 | `PUT /students/:id` | Returns 400 for invalid data |
 | 23 | `PUT /students/:id` | Returns 409 for duplicate email |
 | 24 | `GET /students/search?sort&page` | Returns paginated and sorted search results |
+| 25 | `POST /students` | Returns 400 for firstName shorter than 2 characters |
+| 26 | `POST /students` | Accepts grade = 0 (lower boundary) |
+| 27 | `POST /students` | Accepts grade = 20 (upper boundary) |
+| 28 | `POST /students` | Returns 400 for grade = -1 |
+| 29 | `POST /students` | Returns 400 for invalid field value |
+| 30 | `POST /students` | Returns 400 for invalid email format |
+| 31 | `GET /students/search` | Returns empty array when no match |
+| 32 | `GET /students/search` | Search is case insensitive |
+| 33 | `GET /students/search` | Returns 400 when q parameter is missing |
+| 34 | `DELETE /students/:id` | Student no longer exists after deletion |
+| 35 | `PUT /students/:id` | Updated data is persisted |
 
 ### Coverage
 
