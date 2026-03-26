@@ -8,10 +8,10 @@ router.get('/', (req, res) => {
   const { page, limit } = req.query;
 
   if (page !== undefined || limit !== undefined) {
-    const p = parseInt(page) || 1;
-    const l = parseInt(limit) || 10;
+    const p = parseInt(page ?? 1);
+    const l = parseInt(limit ?? 10);
 
-    if (p < 1 || l < 1) return res.status(400).json({ error: 'page and limit must be positive integers' });
+    if (isNaN(p) || isNaN(l) || p < 1 || l < 1) return res.status(400).json({ error: 'page and limit must be positive integers' });
 
     return res.json(getStudents(p, l));
   }
@@ -24,10 +24,18 @@ router.get('/stats', (_req, res) => {
   res.json(getStats());
 });
 
-// GET /students/search?q= — search by name
+// GET /students/search?q= — search by name with optional pagination
 router.get('/search', (req, res) => {
-  const { q } = req.query;
+  const { q, page, limit } = req.query;
   if (!q || q.trim() === '') return res.status(400).json({ error: 'Query parameter q is required' });
+
+  if (page !== undefined || limit !== undefined) {
+    const p = parseInt(page ?? 1);
+    const l = parseInt(limit ?? 10);
+    if (isNaN(p) || isNaN(l) || p < 1 || l < 1) return res.status(400).json({ error: 'page and limit must be positive integers' });
+    return res.json(searchStudents(q, p, l));
+  }
+
   res.json(searchStudents(q));
 });
 

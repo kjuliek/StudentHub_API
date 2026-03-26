@@ -64,25 +64,29 @@ function getStats() {
   return { totalStudents: total, averageGrade, studentsByField, bestStudent };
 }
 
-function searchStudents(query) {
-  const q = query.toLowerCase();
-  return students.filter(s =>
-    s.firstName.toLowerCase().includes(q) || s.lastName.toLowerCase().includes(q)
-  );
-}
-
-function getStudents(page, limit) {
+function paginate(array, page, limit) {
   const start = (page - 1) * limit;
-  const data = students.slice(start, start + limit);
   return {
-    data,
+    data: array.slice(start, start + limit),
     pagination: {
       page,
       limit,
-      total: students.length,
-      totalPages: Math.ceil(students.length / limit),
+      total: array.length,
+      totalPages: Math.ceil(array.length / limit),
     },
   };
+}
+
+function searchStudents(query, page = null, limit = null) {
+  const q = query.toLowerCase();
+  const results = students.filter(s =>
+    s.firstName.toLowerCase().includes(q) || s.lastName.toLowerCase().includes(q)
+  );
+  return page && limit ? paginate(results, page, limit) : results;
+}
+
+function getStudents(page, limit) {
+  return paginate(students, page, limit);
 }
 
 module.exports = { validateStudent, createStudent, updateStudent, deleteStudent, getStats, searchStudents, getStudents };
