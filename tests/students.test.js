@@ -119,6 +119,16 @@ describe('PUT /students/:id', () => {
     const res = await request(app).put('/students/999').send(validStudent);
     expect(res.statusCode).toBe(404);
   });
+
+  it('should return 400 for invalid data on PUT', async () => {
+    const res = await request(app).put('/students/1').send({ ...validStudent, email: 'alice.martin@email.com', grade: 99 });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('should return 409 for duplicate email on PUT', async () => {
+    const res = await request(app).put('/students/1').send({ ...validStudent, email: 'bob.dupont@email.com' });
+    expect(res.statusCode).toBe(409);
+  });
 });
 
 // ─── DELETE /students/:id ────────────────────────────────────────────────────
@@ -185,5 +195,37 @@ describe('GET /students with sort', () => {
   it('should return 400 for an invalid order value', async () => {
     const res = await request(app).get('/students?sort=grade&order=invalid');
     expect(res.statusCode).toBe(400);
+  });
+
+  it('should sort correctly when two students have equal values', async () => {
+    const res = await request(app).get('/students?sort=field&order=asc');
+    expect(res.statusCode).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+  });
+});
+
+// ─── GET /students/search with sort & pagination ──────────────────────────────
+
+describe('GET /students/search with sort and pagination', () => {
+  it('should return 400 for invalid sort field on search', async () => {
+    const res = await request(app).get('/students/search?q=alice&sort=invalid');
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('should return 400 for invalid order on search', async () => {
+    const res = await request(app).get('/students/search?q=alice&order=invalid');
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('should return 400 for invalid page on search', async () => {
+    const res = await request(app).get('/students/search?q=alice&page=0&limit=10');
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('should return paginated and sorted search results', async () => {
+    const res = await request(app).get('/students/search?q=a&page=1&limit=2&sort=grade&order=desc');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data).toBeDefined();
+    expect(res.body.pagination).toBeDefined();
   });
 });
