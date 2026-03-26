@@ -1,11 +1,23 @@
 const express = require('express');
 const router = express.Router();
 const { students } = require('../data/students');
-const { validateStudent, createStudent, updateStudent, deleteStudent } = require('../services/students');
+const { validateStudent, createStudent, updateStudent, deleteStudent, getStats, searchStudents } = require('../services/students');
 
 // GET /students — list all students
 router.get('/', (req, res) => {
   res.json(students);
+});
+
+// GET /students/stats — get statistics
+router.get('/stats', (_req, res) => {
+  res.json(getStats());
+});
+
+// GET /students/search?q= — search by name
+router.get('/search', (req, res) => {
+  const { q } = req.query;
+  if (!q || q.trim() === '') return res.status(400).json({ error: 'Query parameter q is required' });
+  res.json(searchStudents(q));
 });
 
 // POST /students — create a student

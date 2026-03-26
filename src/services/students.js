@@ -48,4 +48,27 @@ function deleteStudent(id) {
   return true;
 }
 
-module.exports = { validateStudent, createStudent, updateStudent, deleteStudent };
+function getStats() {
+  const total = students.length;
+  const averageGrade = total
+    ? Math.round((students.reduce((sum, s) => sum + s.grade, 0) / total) * 100) / 100
+    : 0;
+
+  const studentsByField = students.reduce((acc, s) => {
+    acc[s.field] = (acc[s.field] || 0) + 1;
+    return acc;
+  }, {});
+
+  const bestStudent = students.reduce((best, s) => (!best || s.grade > best.grade ? s : best), null);
+
+  return { totalStudents: total, averageGrade, studentsByField, bestStudent };
+}
+
+function searchStudents(query) {
+  const q = query.toLowerCase();
+  return students.filter(s =>
+    s.firstName.toLowerCase().includes(q) || s.lastName.toLowerCase().includes(q)
+  );
+}
+
+module.exports = { validateStudent, createStudent, updateStudent, deleteStudent, getStats, searchStudents };
