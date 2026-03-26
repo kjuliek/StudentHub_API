@@ -24,6 +24,39 @@ cd StudentHub_API
 npm install
 ```
 
+## CI/CD Pipeline
+
+The pipeline is configured in [.github/workflows/ci.yml](.github/workflows/ci.yml) and runs automatically on every **push** or **pull request** to `main`.
+
+### Trigger
+
+```yaml
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+```
+
+### Matrix strategy
+
+The pipeline runs in parallel on **Node.js 18 and 20** to ensure compatibility across versions.
+
+### Steps
+
+| Step | Command | Description |
+|------|---------|-------------|
+| Checkout | `actions/checkout@v4` | Clone the repository into the runner |
+| Setup | `actions/setup-node@v4` | Install the Node.js version from the matrix |
+| Install | `npm install` | Install all dependencies |
+| Lint | `npm run lint` | Check code quality — any error fails the pipeline |
+| Test | `npm test` | Run the test suite — any failure fails the pipeline |
+
+### Result
+
+- All steps pass on both Node versions → **pipeline green**
+- Any lint error or failing test → **pipeline red**
+
 ## Available Scripts
 
 | Command | Description |
