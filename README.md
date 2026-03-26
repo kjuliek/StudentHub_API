@@ -223,12 +223,32 @@ Base URL: `http://localhost:3000`
 | Method | Endpoint | Description | Success | Errors |
 |--------|----------|-------------|---------|--------|
 | `GET` | `/students` | List all students | 200 | — |
+| `GET` | `/students?page=1&limit=10` | List students with pagination | 200 | 400 |
 | `GET` | `/students/stats` | Get statistics | 200 | — |
 | `GET` | `/students/search?q=` | Search students by name | 200 | 400 |
 | `POST` | `/students` | Create a new student | 201 | 400, 409 |
 | `GET` | `/students/:id` | Get a student by ID | 200 | 400, 404 |
 | `PUT` | `/students/:id` | Update a student | 200 | 400, 404, 409 |
 | `DELETE` | `/students/:id` | Delete a student | 200 | 400, 404 |
+
+### Pagination
+
+When `?page` or `?limit` are provided, the response format changes:
+
+```json
+{
+  "data": [...],
+  "pagination": {
+    "page": 1,
+    "limit": 2,
+    "total": 5,
+    "totalPages": 3
+  }
+}
+```
+
+- `page` and `limit` must be positive integers → otherwise 400
+- If the page is out of range, `data` is an empty array
 
 ### Examples (Git Bash)
 
@@ -237,6 +257,11 @@ Base URL: `http://localhost:3000`
 GET /students — returns the full list
 ```bash
 curl -s http://localhost:3000/students
+```
+
+GET /students with pagination — returns page 1 with 2 students per page
+```bash
+curl -s "http://localhost:3000/students?page=1&limit=2"
 ```
 
 GET /students/1 — returns student with ID 1
@@ -334,6 +359,16 @@ console.log(`Server running on port ${PORT}`);
 **Problem:** `Invoke-RestMethod` throws an exception on 4xx/5xx responses without displaying the HTTP status code, making it impossible to verify error handling directly.
 
 **Fix:** Use **Git Bash** with `curl` instead. The `-s -o /dev/null -w "%{http_code}"` flags display only the status code, and removing `-o /dev/null` shows the response body.
+
+### Pagination — `page=0` not rejected
+
+**Problem:** Using `parseInt(page) || 1` to parse the page parameter caused `page=0` to silently default to `1` instead of returning a 400 error. Since `0` is falsy in JavaScript, the `||` operator replaces it with the default value before validation runs.
+
+**Fix:** Use `??` (nullish coalescing) instead of `||` to preserve `0`, then validate after parsing:
+```js
+const p = parseInt(page ?? 1);
+if (isNaN(p) || p < 1) return res.status(400).json({ error: '...' });
+```
 
 ### GitHub Actions — Node.js 20 deprecation warning
 
