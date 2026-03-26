@@ -9,8 +9,6 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/kjuliek/StudentHub_API)
 ![GitHub issues](https://img.shields.io/github/issues/kjuliek/StudentHub_API)
 ![GitHub repo size](https://img.shields.io/github/repo-size/kjuliek/StudentHub_API)
-![GitHub stars](https://img.shields.io/github/stars/kjuliek/StudentHub_API)
-![GitHub forks](https://img.shields.io/github/forks/kjuliek/StudentHub_API)
 ![GitHub pull requests](https://img.shields.io/github/issues-pr/kjuliek/StudentHub_API)
 
 A RESTful API built with Node.js and Express.
@@ -63,7 +61,7 @@ The pipeline runs in parallel on **Node.js 18 and 20** to ensure compatibility a
 | Setup | `actions/setup-node@v5` | Install the Node.js version from the matrix |
 | Install | `npm install` | Install all dependencies |
 | Lint | `npm run lint` | Check code quality — any error fails the pipeline |
-| Test | `npm test` | Run the test suite — any failure fails the pipeline |
+| Test | `npm test` | Run the test suite with coverage — any failure fails the pipeline |
 
 ### Result
 
@@ -87,7 +85,7 @@ To prove the pipeline detects bugs, we intentionally introduced and then fixed a
 | Command | Description |
 |---------|-------------|
 | `npm start` | Start the server on port 3000 |
-| `npm test` | Run the test suite with Jest |
+| `npm test` | Run the test suite with Jest and display coverage report |
 | `npm run lint` | Run ESLint on the codebase |
 
 ### Linter setup
@@ -139,6 +137,28 @@ npm test
 | 13 | `DELETE /students/:id` | Returns 404 for a non-existing ID |
 | 14 | `GET /students/stats` | Returns totalStudents, averageGrade, studentsByField, bestStudent |
 | 15 | `GET /students/search` | Returns matching students by name |
+| 16 | `GET /students?page&limit` | Returns paginated students |
+| 17 | `GET /students?page=0` | Returns 400 for invalid page |
+| 18 | `GET /students?sort=grade&order=desc` | Returns students sorted by grade descending |
+| 19 | `GET /students?sort=grade&order=asc` | Returns students sorted by grade ascending |
+| 20 | `GET /students?sort=invalid` | Returns 400 for invalid sort field |
+| 21 | `GET /students?sort=grade&order=invalid` | Returns 400 for invalid order value |
+| 22 | `PUT /students/:id` | Returns 400 for invalid data |
+| 23 | `PUT /students/:id` | Returns 409 for duplicate email |
+| 24 | `GET /students/search?sort&page` | Returns paginated and sorted search results |
+
+### Coverage
+
+Jest is configured to collect coverage on all files in `src/` (except `index.js`).
+
+| File | Statements | Branches | Functions | Lines |
+|------|-----------|----------|-----------|-------|
+| `src/app.js` | 100% | 100% | 100% | 100% |
+| `src/data/students.js` | 100% | 100% | 100% | 100% |
+| `src/routes/students.js` | ~95% | ~88% | 100% | ~98% |
+| `src/services/students.js` | ~92% | ~79% | 100% | 100% |
+
+> Coverage report is generated automatically on every `npm test` run in the `coverage/` directory.
 
 ## Project Setup (how this project was initialized)
 
