@@ -1,5 +1,18 @@
 # StudentHub API
 
+![CI](https://github.com/kjuliek/StudentHub_API/actions/workflows/ci.yml/badge.svg)
+![Node.js](https://img.shields.io/badge/node-%3E%3D18-brightgreen)
+![Express](https://img.shields.io/badge/express-4.x-blue)
+![Jest](https://img.shields.io/badge/tested%20with-jest-99424f)
+![ESLint](https://img.shields.io/badge/linted%20with-eslint-4B32C3)
+![License](https://img.shields.io/badge/license-ISC-yellow)
+![GitHub last commit](https://img.shields.io/github/last-commit/kjuliek/StudentHub_API)
+![GitHub issues](https://img.shields.io/github/issues/kjuliek/StudentHub_API)
+![GitHub repo size](https://img.shields.io/github/repo-size/kjuliek/StudentHub_API)
+![GitHub stars](https://img.shields.io/github/stars/kjuliek/StudentHub_API)
+![GitHub forks](https://img.shields.io/github/forks/kjuliek/StudentHub_API)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/kjuliek/StudentHub_API)
+
 A RESTful API built with Node.js and Express.
 
 ## Tech Stack
